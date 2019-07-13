@@ -31,7 +31,7 @@ def sanitize(html, plaintext=False):
         text = article.prettify()
     else:
         remove_all_tags(article)
-        text = article.get_text()
+        text = article.get_text(' ')
     return text.strip()
 
 
