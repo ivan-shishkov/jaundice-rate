@@ -11,6 +11,10 @@ from adapters import SANITIZERS, ArticleNotFound
 from text_tools import split_by_words, calculate_jaundice_rate
 
 
+class AdapterNotImplemented(Exception):
+    pass
+
+
 class ProcessingStatus(Enum):
     OK = 'OK'
     FETCH_ERROR = 'FETCH_ERROR'
@@ -44,14 +48,12 @@ def get_article_processing_results(status, url, words_count=None, score=None):
     }
 
 
-def get_sanitized_article_text(html, plaintext=True):
-    for sanitizer in SANITIZERS.values():
-        try:
+def get_sanitized_article_text(article_url, html, plaintext=True):
+    for site_name, sanitizer in SANITIZERS.items():
+        if site_name in article_url:
             return sanitizer(html=html, plaintext=plaintext)
-        except ArticleNotFound:
-            continue
 
-    raise ArticleNotFound
+    raise AdapterNotImplemented
 
 
 async def process_article(
@@ -62,7 +64,7 @@ async def process_article(
         async with timeout(max_pending_time_of_fetching_article):
             html = await fetch(session, article_url)
 
-        article_text = get_sanitized_article_text(html)
+        article_text = get_sanitized_article_text(article_url, html)
 
         with work_time_counter():
             async with timeout(max_pending_time_of_splitting_by_words):
@@ -73,7 +75,7 @@ async def process_article(
             status=ProcessingStatus.FETCH_ERROR,
             url=article_url,
         )
-    except ArticleNotFound:
+    except (ArticleNotFound, AdapterNotImplemented):
         return get_article_processing_results(
             status=ProcessingStatus.PARSING_ERROR,
             url=article_url,
