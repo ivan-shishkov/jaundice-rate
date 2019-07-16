@@ -11,7 +11,7 @@ from adapters import SANITIZERS, ArticleNotFound
 from text_tools import split_by_words, calculate_jaundice_rate
 
 
-class AdapterNotImplemented(Exception):
+class SanitizerNotImplemented(Exception):
     pass
 
 
@@ -53,7 +53,7 @@ def get_sanitized_article_text(article_url, html, plaintext=True):
         if site_name in article_url:
             return sanitizer(html=html, plaintext=plaintext)
 
-    raise AdapterNotImplemented
+    raise SanitizerNotImplemented
 
 
 async def process_article(
@@ -75,7 +75,7 @@ async def process_article(
             status=ProcessingStatus.FETCH_ERROR,
             url=article_url,
         )
-    except (ArticleNotFound, AdapterNotImplemented):
+    except (ArticleNotFound, SanitizerNotImplemented):
         return get_article_processing_results(
             status=ProcessingStatus.PARSING_ERROR,
             url=article_url,
