@@ -70,7 +70,7 @@ async def process_article(
             async with timeout(max_pending_time_of_splitting_by_words):
                 article_words = await split_by_words(morph, article_text)
 
-    except aiohttp.ClientResponseError:
+    except aiohttp.ClientError:
         return get_article_processing_results(
             status=ProcessingStatus.FETCH_ERROR,
             url=article_url,
