@@ -5,10 +5,13 @@ from enum import Enum
 from contextlib import contextmanager
 
 import aiohttp
+import pytest
+import pymorphy2
 from async_timeout import timeout
 
 from adapters import SANITIZERS, ArticleNotFound
 from text_tools import split_by_words, calculate_jaundice_rate
+from utils import get_charged_words
 
 
 class SanitizerNotImplemented(Exception):
@@ -94,3 +97,52 @@ async def process_article(
         words_count=len(article_words),
         score=jaundice_rate,
     )
+
+
+@pytest.mark.asyncio
+async def test_process_article():
+    morph = pymorphy2.MorphAnalyzer()
+    charged_words = get_charged_words()
+
+    async with aiohttp.ClientSession() as session:
+        article_processing_results = await process_article(
+            session=session,
+            article_url='https://inosmi.ru/science/20190710/245445499.html',
+            morph=morph,
+            charged_words=charged_words,
+        )
+        assert article_processing_results['status'] == ProcessingStatus.OK.value
+
+        article_processing_results = await process_article(
+            session=session,
+            article_url='https://inosmi.ru/science/20190710/245445498.html',
+            morph=morph,
+            charged_words=charged_words,
+        )
+        assert article_processing_results['status'] == ProcessingStatus.FETCH_ERROR.value
+
+        article_processing_results = await process_article(
+            session=session,
+            article_url='https://example.com',
+            morph=morph,
+            charged_words=charged_words,
+        )
+        assert article_processing_results['status'] == ProcessingStatus.PARSING_ERROR.value
+
+        article_processing_results = await process_article(
+            session=session,
+            article_url='https://inosmi.ru/science/20190710/245445499.html',
+            morph=morph,
+            charged_words=charged_words,
+            max_pending_time_of_fetching_article=0.1,
+        )
+        assert article_processing_results['status'] == ProcessingStatus.TIMEOUT.value
+
+        article_processing_results = await process_article(
+            session=session,
+            article_url='https://inosmi.ru/science/20190710/245445499.html',
+            morph=morph,
+            charged_words=charged_words,
+            max_pending_time_of_splitting_by_words=0.1,
+        )
+        assert article_processing_results['status'] == ProcessingStatus.TIMEOUT.value
