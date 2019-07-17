@@ -26,14 +26,14 @@ class ProcessingStatus(Enum):
 
 
 @contextmanager
-def work_time_counter():
+def work_time_counter(info_string=''):
     start_time = time.monotonic()
     try:
         yield
     finally:
         end_time = time.monotonic()
         work_time = end_time - start_time
-        logging.info(f'Work time: {work_time:.3f} sec')
+        logging.info(f'{info_string} work time: {work_time:.3f} sec')
 
 
 async def fetch(session, url):
@@ -69,7 +69,7 @@ async def process_article(
 
         article_text = get_sanitized_article_text(article_url, html)
 
-        with work_time_counter():
+        with work_time_counter(f'Splitting by words for article {article_url}'):
             async with timeout(max_pending_time_of_splitting_by_words):
                 article_words = await split_by_words(morph, article_text)
 
