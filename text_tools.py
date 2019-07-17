@@ -12,7 +12,10 @@ def _clean_word(word):
 
 
 async def split_by_words(morph, text):
-    """Учитывает знаки пунктуации, регистр и словоформы, выкидывает предлоги."""
+    """Разделяет текст на отдельные слова.
+
+    Учитывает знаки пунктуации, регистр и словоформы, выкидывает предлоги.
+    """
     words = []
     for word in text.split():
         cleaned_word = _clean_word(word)
@@ -33,7 +36,7 @@ async def test_split_by_words():
 
 
 def calculate_jaundice_rate(article_words, charged_words):
-    """Расчитывает желтушность текста, принимает список "заряженных" слов и ищет их внутри article_words."""
+    """Рассчитывает желтушность текста, принимает список "заряженных" слов и ищет их внутри article_words."""
 
     if not article_words:
         return 0.0
