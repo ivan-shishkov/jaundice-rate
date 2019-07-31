@@ -1,0 +1,11 @@
+.git
+
+*.md
+
+.editorconfig
+
+.dockerignore
+
+Dockerfile
+
+docker-compose.yml
