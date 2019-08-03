@@ -25,6 +25,7 @@ $ pip install -r requirements.txt
 
 ```bash
 
+$ cd src/
 $ python server.py
 
 ```
@@ -145,6 +146,11 @@ http://127.0.0.1:8080?urls=https://inosmi.ru/politic/20190713/245466415.html,htt
 Для тестирования используется [pytest](https://docs.pytest.org/en/latest/).
 Команды для запуска тестов:
 
+```bash
+
+$ cd src/
+
+```
 ```bash
 
 $ pytest adapters/inosmi_ru.py

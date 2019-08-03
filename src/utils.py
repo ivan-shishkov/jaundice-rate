@@ -20,7 +20,7 @@ def load_text_data(filepath):
         return file_object.read()
 
 
-def get_charged_words(charged_dict_path='charged_dict'):
+def get_charged_words(charged_dict_path='../charged_dict'):
     negative_words = (load_text_data(
         os.path.join(charged_dict_path, 'negative_words.txt'),
     )).splitlines()
